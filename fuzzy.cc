@@ -3,6 +3,7 @@
 #include<compare>
 #include<cmath>
 #include<cassert>
+#include<iostream>
 
 using namespace std;
 
@@ -14,163 +15,161 @@ class TriFuzzyNum {
 		real_t m;
 		real_t u;
 		real_t first;
-    real_t second;
-    real_t third;
+		real_t second;
+		real_t third;
 
 	public:
-		TriFuzzyNum(real_t a, real_t b, real_t c) {
+		constexpr TriFuzzyNum(real_t a, real_t b, real_t c) {
 			if (a > b) {swap (a, b);}
 			if (b > c) {swap (b, c);}
 			if (a > b) {swap (a, b);}
 			l = a;
 			m = b;
 			u = c;
+
+			// We want to get these via functions with same signatures as lowe_value
 			real_t z = (u - l) + sqrt(1 + (u - m) * (u - m)) + sqrt(1 + (m - l) * (m - l));
-    	real_t x = ((u - l) * m + sqrt(1 + (u - m) * (u - m)) * l + sqrt(1 + (m - l) * (m - l)) * u) / z;
-    	real_t y = (u - l) / z;
+			real_t x = ((u - l) * m + sqrt(1 + (u - m) * (u - m)) * l + sqrt(1 + (m - l) * (m - l)) * u) / z;
+			real_t y = (u - l) / z;
 			first = x - y / 2;
-    	second = 1 - y;
-    	third = m;
-		}
-		
-
-		// Default copy constructor is fine
-		TriFuzzyNum(const TriFuzzyNum& other) : l(other.l), m(other.m), u(other.u) {} 
-		
-		TriFuzzyNum& operator= (const TriFuzzyNum& other) {
-			l = other.l;
-			m = other.m;
-			u = other.u;
-			return *this;
+			second = 1 - y;
+			third = m;
 		}
 
-		// Maybe initialization list ?
-		TriFuzzyNum (TriFuzzyNum&& other) {
-			*this  = other;
-		}
-
-		TriFuzzyNum& operator= (TriFuzzyNum&& other) {
-			return	*this = other;
-		}
-	
-		real_t lower_value() {
+		constexpr real_t lower_value() const {
 			return l;
 		}
 
-		real_t modal_value() {
+		constexpr real_t modal_value() const {
 			return m;
 		}
 
-		real_t upper_value() {
+		constexpr real_t upper_value() const {
 			return u;
 		}
+	
+		friend ostream& operator<< (std::ostream& os, const TriFuzzyNum& num) {
+			os << "(" << num.l << ", " << num.m << ", " << num.u << ")";
+			return os;
+		}
 
-	auto operator<=>(const TriFuzzyNum& right_operand) const {
-			if (auto cmp = this->first <=> right_operand.first; cmp != 0)
-					return cmp;
-			if (auto cmp = this->second <=> right_operand.second; cmp != 0)
-					return cmp;
-			auto cmp = this->third <=> right_operand.third;
+		partial_ordering operator<=>(const TriFuzzyNum& other) const {
+			if (auto cmp = this->first <=> other.first; cmp != 0)
+				return cmp;
+			if (auto cmp = this->second <=> other.second; cmp != 0)
+				return cmp;
+			auto cmp = this->third <=> other.third;
 			return cmp;
 		}
 
-	TriFuzzyNum& operator+= (const TriFuzzyNum& right_operand) {
-    this->l += right_operand.l;
-    this->m += right_operand.m;
-    this->u += right_operand.u;
-    return *this;
-	}
-};
+		bool operator== (const TriFuzzyNum& other) const = default;
 
-
-class TriFuzzyNumSet {
-	public:
-		TriFuzzyNumSet() : s() {}
-
-		TriFuzzyNumSet(initializer_list<TriFuzzyNum> args) {
-			s = set<TriFuzzyNum>(args);
-		}
-
-		// Default copy constructor also fine?
-		// TriFuzzyNumSet(const TriFuzzyNumSet& other): s(other.s) {}
-
-		TriFuzzyNumSet& operator= (const TriFuzzyNumSet& other) {
-			s.clear(); // Maybe not needed
-			s = other.s;
+		// We should sort values those parameters
+		
+		TriFuzzyNum& operator+= (const TriFuzzyNum& other) {
+			this->l += other.l;
+			this->m += other.m;
+			this->u += other.u;
 			return *this;
 		}
 
-		// Maybe initialization list ?
-		TriFuzzyNumSet (TriFuzzyNumSet&& other) {
-			*this = other;
-		}
-
-		TriFuzzyNumSet& operator= (TriFuzzyNumSet&& other) {
-			s.clear(); // Maybe not needed
-			s = move(other.s);
+		TriFuzzyNum& operator-= (const TriFuzzyNum& other) {
+			this->l -= other.u;
+			this->m -= other.m;
+			this->u -= other.l;
 			return *this;
 		}
 
-		void insert(const TriFuzzyNum& num) {
-			s.insert(num);
+		TriFuzzyNum& operator*= (const TriFuzzyNum& other) {
+			this->l *= other.l;
+			this->m *= other.m;
+			this->u *= other.u;
+			return *this;
 		}
 
-		void insert(TriFuzzyNum&& num) {
-			s.insert(move(num));
+		const TriFuzzyNum operator+ (const TriFuzzyNum& other) const{
+			return TriFuzzyNum(*this) += other;
 		}
 
-		void remove(const TriFuzzyNum& num) {
-			s.erase(num);
+		const TriFuzzyNum operator- (const TriFuzzyNum& other) const{
+			TriFuzzyNum result = *this;
+			result -= other;
+			return result;
 		}
 
-		void remove(TriFuzzyNum&& num) {
-			s.erase(num);
+		const TriFuzzyNum operator* (const TriFuzzyNum& other) const{
+			TriFuzzyNum result = *this;
+			result *= other;
+			return result;
 		}
+	};
 
-		TriFuzzyNum arithmetic_mean() {
-			TriFuzzyNum sum = TriFuzzyNum(0., 0., 0);
-			for (const TriFuzzyNum& num : s)
-				sum += num;
-			size_t n = s.size();
+	class TriFuzzyNumSet {
+		public:
+			TriFuzzyNumSet() : s() {}
 
-			real_t l = sum.lower_value() / n;
-			real_t m = sum.modal_value() / n;
-			real_t r = sum.upper_value() / n;
-			return TriFuzzyNum(l, m, r);
-		}
+			TriFuzzyNumSet(initializer_list<TriFuzzyNum> args) {
+				s = multiset<TriFuzzyNum>(args);
+			}
+
+			void insert(const TriFuzzyNum& num) {
+				s.insert(num);
+			}
+
+			void insert(TriFuzzyNum&& num) {
+				s.insert(move(num));
+			}
+
+			void remove(const TriFuzzyNum& num) {
+				s.erase(num);
+			}
+
+			void remove(TriFuzzyNum&& num) {
+				s.erase(num);
+			}
+
+			TriFuzzyNum arithmetic_mean() const {
+				TriFuzzyNum sum = TriFuzzyNum(0., 0., 0);
+				for (const TriFuzzyNum& num : s)
+					sum += num;
+				size_t n = s.size();
+
+				real_t l = sum.lower_value() / n;
+				real_t m = sum.modal_value() / n;
+				real_t r = sum.upper_value() / n;
+				return TriFuzzyNum(l, m, r);
+			}
 
 	private:
-		set<TriFuzzyNum> s;
+		multiset<TriFuzzyNum> s;
 };
 
-TriFuzzyNum crisp_number(real_t v) {
+consteval TriFuzzyNum crisp_number(real_t v) {
 	return TriFuzzyNum(v, v, v);
 }
 
-TriFuzzyNum crisp_zero() {
-	return TriFuzzyNum(0, 0, 0);
-}
+inline constinit const TriFuzzyNum crisp_zero = TriFuzzyNum(0, 0, 0);
 
 int main() {
 	TriFuzzyNum num1(1, 2, 3);
-	TriFuzzyNum num2(0.5, 0.25, 0.75);
-	//constexpr TriFuzzyNum num3(1, 1, 1);
+  	TriFuzzyNum num2(0.5, 0.25, 0.75);
+	constexpr TriFuzzyNum num3(1, 1, 1);
 
-	// cout << num1 << endl;  // (1, 2, 3)
-	// cout << num2 << endl;  // (0.25, 0.5, 0.75)
-	// cout << num3 << endl;  // (1, 1, 1)
+	cout << num1 << endl;  // (1, 2, 3)
+	cout << num2 << endl;  // (0.25, 0.5, 0.75)
+	cout << num3 << endl;  // (1, 1, 1)
 
-	//assert(num1 + num2 == TriFuzzyNum(1.25, 2.5, 3.75));
-	//assert(num1 - num2 == TriFuzzyNum(0.25, 1.5, 2.75));
-	//assert(num1 * num2 == TriFuzzyNum(0.25, 1, 2.25));
+	assert(num1 + num2 == TriFuzzyNum(1.25, 2.5, 3.75));
+	assert(num1 - num2 == TriFuzzyNum(0.25, 1.5, 2.75));
+	assert(num1 * num2 == TriFuzzyNum(0.25, 1, 2.25));
 
 	assert(num1 > num2);
 	assert(num1 >= num2);
-	// assert(num1 != num2);
+	assert(num1 != num2);
 	assert(num2 < num1);
 	assert(num2 <= num1);
-	//assert(num3 == crisp_number(1));
-	// static_assert(num3 == crisp_number(1));
+	assert(num3 == crisp_number(1));
+	static_assert(num3 == crisp_number(1));
 
 	assert(num1 <=> num2 > 0);
 	assert(num2 <=> num1 < 0);
