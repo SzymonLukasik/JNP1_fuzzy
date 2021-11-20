@@ -34,9 +34,9 @@ class TriFuzzyNum {
         constexpr bool operator!= (const TriFuzzyNum& other) const = default;
         		
         constexpr TriFuzzyNum& operator+=(const TriFuzzyNum& other) {
-            this->l = this->l - other.l;
-            this->m = this->m - other.m;
-            this->u = this->u - other.u;
+            this->l = this->l + other.l;
+            this->m = this->m + other.m;
+            this->u = this->u + other.u;
             return *this;
         }
 
