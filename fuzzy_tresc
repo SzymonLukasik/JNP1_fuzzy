@@ -1,0 +1,111 @@
+Liczby rozmyte (ang. fuzzy numbers) stosuje się do opisu wielkości lub zjawisk
+nieprecyzyjnych lub niepewnych. Z grubsza rzecz ujmując, są one pewnym
+uogólnieniem liczb rzeczywistych, gdyż zamiast odnosić się do pojedynczej
+wartości, reprezentują spójny zbiór możliwych wartości, z których każda ma
+określony pewien stopień przynależności z przedziału [0, 1]. Do najprostszych
+należą trójkątne liczby rozmyte (ang. triangular fuzzy numbers), których
+przynależność definiowana jest funkcją postaci:
+
+       { (x - l) / (m - l), gdy l <= x <= m;
+f(x) = { (u - x) / (u - m), gdy m < x <= u;
+       { 0,                 w przeciwnym razie;
+
+gdzie x, l, m, u są liczbami rzeczywistymi takimi, że l < m < u. Parametr l
+określa lewy koniec trójkąta, m określa szczyt trójkąta, zaś u określa prawy
+koniec trójkąta. Oczywiście żadne wartości spoza przedziału [l, u] nie należą
+do tak zdefiniowanej liczby rozmytej. Dopuszczalna jest również sytuacja, gdy
+trójkątna liczba rozmyta reprezentuje zwykłą liczbę rzeczywistą, tzn.
+l = m = u. Zatem do reprezentowania trójkątnej liczby rozmytej stosować można
+trójkę liczb rzeczywistych (l, m, u), gdzie l <= m <= u.
+Na przykład, trójka (1, 2, 3) reprezentuje trójkątną liczbę rozmytą, której
+funkcja przynależności ma kształt trójkąta o wierzchołkach (1, 0), (2, 1)
+i (3, 0).
+
+W ramach zadania należy zaimplementować klasę TriFuzzyNum reprezentującą
+trójkątną liczbę rozmytą. Parametry l, m i u tej liczby mają być typu real_t,
+będącego aliasem typu zmiennoprzecinkowego, np. double. W ramach tej klasy
+powinna być możliwość:
+ - utworzenia trójkątnej liczby rozmytej na podstawie wartości jej parametrów
+   l, m oraz u, przy czym kolejność ich podania nie ma znaczenia, np.
+     TriFuzzyNum num(1.25, 2.25, 3.25);
+     TriFuzzyNum num(2.25, 3.25, 1.25);
+     constexpr TriFuzzyNum num(1.25, 2.25, 3.25);
+     constinit static TriFuzzyNum num(1.25, 2.25, 3.25);
+   Nie powinno być natomiast możliwości utworzenia obiektu bez podania któregoś
+   lub żadnego parametru.
+ - utworzenia trójkątnej liczby rozmytej za pomocą kopiowania oraz przenoszenia
+   (ang. copy and move constructors);
+ - odczytania wartości parametrów l, m i u za pomocą metod lower_value,
+   modal_value i upper_value, które mogą być wykonywane w czasie kompilacji;
+ - realizacji operacji przypisania w wersji kopiującej i przenoszącej;
+ - wykonania następujących operacji arytmetycznych:
+     (l1, m1, u1) + (l2, m2, u2) = (l1 + l2, m1 + m2, u1 + u2),
+     (l1, m1, u1) - (l2, m2, u2) = (l1 - u2, m1 - m2, u1 - l2),
+     (l1, m1, u1) * (l2, m2, u2) = (l1 * l2, m1 * m2, u1 * u2)
+   oraz ich wersji z operatorem przypisania +=, -= i *=;
+ - wysłania do Strumienia wyjściowego napisu postaci "(l, m, u)", np.
+   "(1.5, 2.5, 3.5)" dla obiektu TriFuzzyNum(1.5, 2.5, 3.5);
+ - porównywania trójkątnych liczb rozmytych za pomocą operatora <=>,
+   dającego w szczególności możliwość porównywania za pomocą operatorów:
+   <, <=, >, >=.
+   Operacje te wymagają porównania nie samych parametrów (l, m, u) trójkątnych
+   liczb rozmytych, ale obliczonych na ich podstawie rang. Rangą trójkątnej
+   liczby rozmytej jest trójka postaci (x - y / 2, 1 - y, m), gdzie
+     x = ((u - l) * m + sqrt(1 + (u - m) * (u - m)) * l + sqrt(1 + (m - l) * (m - l)) * u) / z,
+     y = (u - l) / z,
+     z = (u - l) + sqrt(1 + (u - m) * (u - m)) + sqrt(1 + (m - l) * (m - l)).
+   Rangi trójkątnych liczb rozmytych należy porównywać zgodnie z porządkiem
+   leksykograficznym. Wymagana metoda porównań trójkątnych liczb rozmytych
+   pochodzi z pracy dostępnej pod adresem:
+     https://www.researchgate.net/publication/260834079_A_new_method_for_ranking_triangular_fuzzy_numbers
+ - porównywania operatorami == i != sprawdzającymi jedynie równość lub różność
+   parametrów (l, m, u) trójkątnych liczb rozmytych.
+
+Oprócz tego należy zaimplementować klasę TriFuzzyNumSet reprezentującą
+wielozbiór trójkątnych liczb rozmytych o następujących własnościach:
+ - kolekcję trójkątnych liczb rozmytych można stworzyć za pomocą
+   TriFuzzyNumSet({fnum1, fnum2, ..., fnumN}),
+   z możliwością tworzenia pustej kolekcji, gdy nie podano żadnego argumentu;
+ - kolekcję można tworzyć, kopiując lub przenosząc inną kolekcję;
+ - kolekcję można przypisywać w wersji kopiującej i przenoszącej;
+ - wstawianie trójkątnej liczby rozmytej do kolekcji ma się odbywać za pomocą
+   metody insert, działającej w wersji kopiującej i przenoszącej;
+ - usuwanie liczby z kolekcji ma być realizowane z pomocą metody remove, przy
+   czym w przypadku, gdy podana jako argument liczba rozmyta nie występuje
+   w kolekcji, to nie jest wykonywana żadna operacja;
+ - kolekcja udostępnia metodę arithmetic_mean, dającą w wyniku trójkątną
+   liczbę rozmytą, której parametry (l, m, u) są średnimi arytmetycznymi
+   poszczególnych parametrów wszystkich liczb przechowywanych w kolekcji, np.
+   dla kolekcji zawierającej trójkątne liczby rozmyte
+     {(1, 2, 3), (1, 2, 3), (1, 5, 6)}
+   średnią arytmetyczną będzie trójkątna liczba rozmyta reprezentowana przez
+   (1, 3, 4).
+   Próba wykonania tej metody na rzecz pustej kolekcji powinna zakończyć się
+   zgłoszeniem standardowego wyjątku std::length_error z komunikatem
+   "TriFuzzyNumSet::arithmetic_mean - the set is empty."
+
+Na koniec należy zdefiniować globalną funkcję crisp_number(real_t v) zwracającą
+trójkątną liczbę rozmytą o parametrach l = m = u = v. Funkcja ta może być
+wykonywana tylko podczas kompilowania. Ponadto zdefiniować należy stałą globalną
+crisp_zero reprezentującą trójkątną liczbę rozmytą (0, 0, 0), która inicjowana
+ma być tylko podczas kompilowania.
+
+Przykład użycia podanych klas znajduje się w pliku fuzzy_example.cc.
+
+Rozwiązanie będzie kompilowane poleceniem
+
+g++ -Wall -Wextra -O2 -std=c++20 -lm *.cc
+
+Rozwiązanie powinno zawierać plik fuzzy.h oraz opcjonalnie plik fuzzy.cc.
+Pliki te należy umieścić w repozytorium w katalogu
+
+grupaN/zadanie3/ab123456+cd123456
+
+lub
+
+grupaN/zadanie3/ab123456+cd123456+ef123456
+
+gdzie N jest numerem grupy, a ab123456, cd123456, ef123456 są identyfikatorami
+członków zespołu umieszczającego to rozwiązanie. Katalog z rozwiązaniem nie
+powinien zawierać innych plików. Nie wolno umieszczać w repozytorium plików
+dużych, binarnych, tymczasowych (np. *.o) ani innych zbędnych.
