@@ -19,9 +19,8 @@ void TriFuzzyNumSet::remove(const TriFuzzyNum &num) { s.erase(num); }
 
 TriFuzzyNum TriFuzzyNumSet::arithmetic_mean() const {
     if (s.empty()) {
-        throw (
-			length_error("TriFuzzyNumSet::arithmetic_mean - the set is empty.")
-		);
+        throw length_error("TriFuzzyNumSet::arithmetic_mean"
+                           " - the set is empty.");
 	} else {
 		TriFuzzyNum sum = TriFuzzyNum(0., 0., 0);
 		for (const TriFuzzyNum &num : s)
