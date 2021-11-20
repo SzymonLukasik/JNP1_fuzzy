@@ -24,7 +24,7 @@ public:
     }
 
     // Copy/move constructors and assignments are default,
-    // because no dynamic memory is allocated/no pointers used.
+    // because there are no pointer type class members.
 
     constexpr std::partial_ordering operator<=>(const TriFuzzyNum &other) const {
         if (auto cmp = this->first() <=> other.first(); cmp != 0)
@@ -63,7 +63,6 @@ public:
         this->u = c;
         return *this;
     }
-
 
     constexpr const TriFuzzyNum operator+(const TriFuzzyNum &other) const {
         return (TriFuzzyNum(*this) += other);
@@ -122,6 +121,9 @@ public:
     TriFuzzyNumSet();
 
     TriFuzzyNumSet(std::initializer_list<TriFuzzyNum> args);
+
+    // Copy/move constructors and assignments are default,
+    // because there are no pointer type class members.
 
     void insert(const TriFuzzyNum &num);
 
