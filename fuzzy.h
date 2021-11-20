@@ -23,6 +23,9 @@ public:
         u = c;
     }
 
+    // Copy/move constructors and assignments are default,
+    // because no dynamic memory is allocated/no pointers used.
+
     constexpr std::partial_ordering operator<=>(const TriFuzzyNum &other) const {
         if (auto cmp = this->first() <=> other.first(); cmp != 0)
             return cmp;
@@ -37,16 +40,16 @@ public:
     constexpr bool operator!=(const TriFuzzyNum &other) const = default;
 
     constexpr TriFuzzyNum &operator+=(const TriFuzzyNum &other) {
-        this->l = this->l + other.l;
-        this->m = this->m + other.m;
-        this->u = this->u + other.u;
+        this->l += other.l;
+        this->m += other.m;
+        this->u += other.u;
         return *this;
     }
 
     constexpr TriFuzzyNum &operator-=(const TriFuzzyNum &other) {
-        this->l = this->l - other.u;
-        this->m = this->m - other.m;
-        this->u = this->u - other.l;
+        this->l -= other.u;
+        this->m -= other.m;
+        this->u -= other.l;
         return *this;
     }
 
@@ -81,10 +84,16 @@ private:
     real_t m;
     real_t u;
 
-    constexpr real_t z() const { return ((u - l) + sqrt(1 + (u - m) * (u - m)) + sqrt(1 + (m - l) * (m - l))); }
+    constexpr real_t sq1() const { return sqrt(1 + (u - m) * (u - m)); }
+
+    constexpr real_t sq2() const { return sqrt(1 + (m - l) * (m - l)); }
+
+    constexpr real_t z() const {
+        return ((u - l) + sq1() + sq2());
+    }
 
     constexpr real_t x() const {
-        return (((u - l) * m + sqrt(1 + (u - m) * (u - m)) * l + sqrt(1 + (m - l) * (m - l)) * u) / z());
+        return (((u - l) * m + sq1() * l + sq2() * u) / z());
     }
 
     constexpr real_t y() const { return ((u - l) / z()); }
@@ -102,7 +111,9 @@ private:
     }
 };
 
-consteval TriFuzzyNum crisp_number(real_t v) { return TriFuzzyNum(v, v, v); }
+inline consteval TriFuzzyNum crisp_number(real_t v) {
+    return TriFuzzyNum(v, v, v);
+}
 
 inline constinit const TriFuzzyNum crisp_zero = crisp_number(0);
 
