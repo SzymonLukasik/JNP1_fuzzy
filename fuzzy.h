@@ -110,9 +110,7 @@ private:
     }
 };
 
-inline consteval TriFuzzyNum crisp_number(real_t v) {
-    return TriFuzzyNum(v, v, v);
-}
+consteval TriFuzzyNum crisp_number(real_t v) { return TriFuzzyNum(v, v, v); }
 
 inline constinit const TriFuzzyNum crisp_zero = crisp_number(0);
 
@@ -120,7 +118,7 @@ class TriFuzzyNumSet {
 public:
     TriFuzzyNumSet();
 
-    TriFuzzyNumSet(std::initializer_list<TriFuzzyNum> args);
+    TriFuzzyNumSet(std::initializer_list <TriFuzzyNum> args);
 
     // Copy/move constructors and assignments are default,
     // because there are no pointer type class members.
@@ -134,7 +132,7 @@ public:
     TriFuzzyNum arithmetic_mean() const;
 
 private:
-    std::multiset<TriFuzzyNum> s;
+    std::multiset <TriFuzzyNum> s;
 };
 
 #endif
