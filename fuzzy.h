@@ -57,9 +57,9 @@ class TriFuzzyNum {
         }
 
         constexpr TriFuzzyNum& operator-=(const TriFuzzyNum& other) {
-            real_t a = this->l - other.l;
+            real_t a = this->l - other.u;
             real_t b = this->m - other.m;
-            real_t c = this->u - other.u;
+            real_t c = this->u - other.l;
 
             if (a > b) {std::swap(a, b); }
             if (b > c) {std::swap(b, c); }
