@@ -1,24 +1,22 @@
-#include<set>
-#include<ostream>
 #include"fuzzy.h"
 
 using namespace std;
 
-ostream& operator<< (ostream& os, const TriFuzzyNum& num) {
-	os << "(" << num.l << ", " << num.m << ", " << num.u << ")";
-	return os;
+ostream &operator<<(ostream &os, const TriFuzzyNum &num) {
+    os << "(" << num.l << ", " << num.m << ", " << num.u << ")";
+    return os;
 }
 
 TriFuzzyNumSet::TriFuzzyNumSet() : s() {}
 
 TriFuzzyNumSet::TriFuzzyNumSet(initializer_list<TriFuzzyNum> args) : s(args) {}
 
-void TriFuzzyNumSet::insert(const TriFuzzyNum& num) {
-	s.insert(num);
+void TriFuzzyNumSet::insert(const TriFuzzyNum &num) {
+    s.insert(num);
 }
 
-void TriFuzzyNumSet::insert(TriFuzzyNum&& num) {
-	s.insert(move(num));
+void TriFuzzyNumSet::insert(TriFuzzyNum &&num) {
+    s.insert(move(num));
 }
 
 void TriFuzzyNumSet::remove(const TriFuzzyNum& num) {
