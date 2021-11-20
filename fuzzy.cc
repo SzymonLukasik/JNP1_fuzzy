@@ -108,9 +108,7 @@ class TriFuzzyNum {
 		public:
 			TriFuzzyNumSet() : s() {}
 
-			TriFuzzyNumSet(initializer_list<TriFuzzyNum> args) {
-				s = multiset<TriFuzzyNum>(args);
-			}
+			TriFuzzyNumSet(initializer_list<TriFuzzyNum> args) : s(args) {}
 
 			void insert(const TriFuzzyNum& num) {
 				s.insert(num);
@@ -121,11 +119,10 @@ class TriFuzzyNum {
 			}
 
 			void remove(const TriFuzzyNum& num) {
-				s.erase(num);
-			}
-
-			void remove(TriFuzzyNum&& num) {
-				s.erase(num);
+				if (s.find(num) != s.end())
+					s.erase(num);
+				else
+					throw length_error("TriFuzzyNumSet::arithmetic_mean - the set is empty.");
 			}
 
 			TriFuzzyNum arithmetic_mean() const {
