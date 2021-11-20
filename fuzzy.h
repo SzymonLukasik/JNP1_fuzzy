@@ -111,7 +111,7 @@ private:
     }
 };
 
-inline consteval TriFuzzyNum crisp_number(real_t v) {
+consteval TriFuzzyNum crisp_number(real_t v) {
     return TriFuzzyNum(v, v, v);
 }
 
