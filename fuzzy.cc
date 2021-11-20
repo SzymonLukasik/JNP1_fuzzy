@@ -20,14 +20,13 @@ void TriFuzzyNumSet::insert(TriFuzzyNum &&num) {
 }
 
 void TriFuzzyNumSet::remove(const TriFuzzyNum &num) {
-    if (s.find(num) != s.end())
-        s.erase(num);
-    else
-        throw length_error("TriFuzzyNumSet::arithmetic_mean - the set is empty.");
+    s.erase(num);
 }
 
 TriFuzzyNum TriFuzzyNumSet::arithmetic_mean() const {
-    TriFuzzyNum sum = TriFuzzyNum(0., 0., 0);
+    if (s.empty())
+		throw length_error("TriFuzzyNumSet::arithmetic_mean - the set is empty.");
+	TriFuzzyNum sum = TriFuzzyNum(0., 0., 0);
     for (const TriFuzzyNum &num : s)
         sum += num;
     size_t n = s.size();
