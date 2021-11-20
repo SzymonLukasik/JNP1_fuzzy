@@ -64,7 +64,6 @@ public:
         return *this;
     }
 
-
     constexpr const TriFuzzyNum operator+(const TriFuzzyNum &other) const {
         return (TriFuzzyNum(*this) += other);
     }

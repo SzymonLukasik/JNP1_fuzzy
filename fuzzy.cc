@@ -11,21 +11,15 @@ TriFuzzyNumSet::TriFuzzyNumSet() : s() {}
 
 TriFuzzyNumSet::TriFuzzyNumSet(initializer_list<TriFuzzyNum> args) : s(args) {}
 
-void TriFuzzyNumSet::insert(const TriFuzzyNum &num) {
-    s.insert(num);
-}
+void TriFuzzyNumSet::insert(const TriFuzzyNum &num) { s.insert(num); }
 
-void TriFuzzyNumSet::insert(TriFuzzyNum &&num) {
-    s.insert(move(num));
-}
+void TriFuzzyNumSet::insert(TriFuzzyNum &&num) { s.insert(move(num)); }
 
-void TriFuzzyNumSet::remove(const TriFuzzyNum &num) {
-    s.erase(num);
-}
+void TriFuzzyNumSet::remove(const TriFuzzyNum &num) { s.erase(num); }
 
 TriFuzzyNum TriFuzzyNumSet::arithmetic_mean() const {
     if (s.empty())
-		throw length_error("TriFuzzyNumSet::arithmetic_mean - the set is empty.");
+        throw length_error("TriFuzzyNumSet::arithmetic_mean - the set is empty.");
 	TriFuzzyNum sum = TriFuzzyNum(0., 0., 0);
     for (const TriFuzzyNum &num : s)
         sum += num;
